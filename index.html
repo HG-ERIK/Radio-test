@@ -246,7 +246,7 @@
   <div id="header">
     <div id="logo">
       <!-- SVG Radio icon -->
-      <img src="data:image/svg+xml;utf8,<svg viewBox='0 0 56 56' fill='none' xmlns='http://www.w3.org/2000/svg'><rect x='6' y='18' width='44' height='28' rx='6' stroke='white' stroke-width='3' fill='white'/><circle cx='18' cy='38' r='6' stroke='white' stroke-width='3' fill='none'/><rect x='32' y='35' width='12' height='4' rx='2' fill='white'/><rect x='9' y='9' width='36' height='4' rx='2' fill='white' transform='rotate(-20 9 9)'/></svg>" alt="Radio Logo"/>
+      <img src="data:image/svg+xml;utf8,<svg viewBox='0 0 56 56' fill='none' xmlns='https://www.w3.org/2000/svg'><rect x='6' y='18' width='44' height='28' rx='6' stroke='white' stroke-width='3' fill='white'/><circle cx='18' cy='38' r='6' stroke='white' stroke-width='3' fill='none'/><rect x='32' y='35' width='12' height='4' rx='2' fill='white'/><rect x='9' y='9' width='36' height='4' rx='2' fill='white' transform='rotate(-20 9 9)'/></svg>" alt="Radio Logo"/>
       Radio
     </div>
     <button id="menu-btn" aria-label="Open menu">&#9776;</button>
@@ -274,13 +274,13 @@
       <svg id="pause-icon" viewBox="0 0 64 64" style="display:none"><rect x="16" y="12" width="12" height="40"/><rect x="36" y="12" width="12" height="40"/></svg>
     </button>
     <input id="volume-slider" type="range" min="0" max="1" step="0.01" value="1" />
-    <audio id="audio" src="http://erik-server.ddns.net:8000/stream"></audio>
+    <audio id="audio" src="https://erik-server.ddns.net:8000/stream"></audio>
   </div>
 
   <script>
     // --- VARIABLES ---
-    const coverUrl = "http://erik-server.ddns.net:5000/image";
-    const metaUrl = "http://erik-server.ddns.net:5000/metadata";
+    const coverUrl = "https://erik-server.ddns.net:5000/image";
+    const metaUrl = "https://erik-server.ddns.net:5000/metadata";
     const albumCoverEl = document.getElementById('album-cover');
     const bgBlurEl = document.getElementById('bg-blur');
     const songTitleEl = document.getElementById('song-title');
