@@ -289,7 +289,7 @@
       </svg>
     </button>
     <input id="volume-slider" type="range" min="0" max="1" step="0.01" value="1" />
-    <audio id="audio" src="https://erik-server.ddns.net:8000/stream"></audio>
+    <audio id="audio" src="https://erik-server.ddns.net/stream"></audio>
   </div>
 
   <!-- 
@@ -327,8 +327,8 @@
       assertExists(menuPopup, 'menu-popup');
 
       // --- CONFIGURATION ---
-      const coverUrl = "https://erik-server.ddns.net:5000/image";
-      const metaUrl  = "https://erik-server.ddns.net:5000/metadata";
+      const coverUrl = "https://erik-server.ddns.net/image";
+      const metaUrl  = "https://erik-server.ddns.net/metadata";
 
       // --- LOAD ALBUM COVER (with error fallback) ---
       function setAlbumCover(src) {
