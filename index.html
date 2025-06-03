@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Internet Radio</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+    body {
+      height: 100vh;
+      min-height: 100vh;
+      position: relative;
+      color: #fff;
+      background-color: #311B0B;
+    }
+    /* BLURRED BACKGROUND */
+    #bg-blur {
+      position: absolute;
+      z-index: 0;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      filter: blur(25px) brightness(0.7);
+      object-fit: cover;
+      object-position: center;
+      transition: background 0.5s;
+      pointer-events: none;
+    }
+    /* CONTENT */
+    #main-content {
+      position: relative;
+      z-index: 1;
+      height: calc(100vh - 100px);
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      gap: 40px;
+      padding: 20px;
+    }
+    /* HEADER */
+    #header {
+      position: absolute;
+      width: 100vw;
+      top: 0; left: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 24px 32px 0 32px;
+      z-index: 2;
+      pointer-events: none;
+    }
+    #logo {
+      font-size: 2rem;
+      font-weight: 600;
+      letter-spacing: 2px;
+      display: flex;
+      align-items: center;
+      pointer-events: auto;
+      user-select: none;
+      color: #fff;
+    }
+    #logo img {
+      height: 2.2rem;
+      margin-right: 10px;
+      vertical-align: middle;
+      filter: drop-shadow(0 2px 8px #0002);
+    }
+    #menu-btn {
+      font-size: 2rem;
+      font-weight: 400;
+      background: none;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      outline: none;
+      pointer-events: auto;
+      user-select: none;
+    }
+    /* MENU DROPDOWN */
+    #menu-popup {
+      display: none;
+      position: absolute;
+      top: 60px;
+      right: 40px;
+      min-width: 210px;
+      background: rgba(255,255,255,0.96);
+      border-radius: 18px;
+      box-shadow: 0 10px 32px #0002;
+      z-index: 9999;
+      padding: 18px 28px;
+      animation: fadeIn 0.2s;
+      font-size: 1.1rem;
+      color: #222;
+    }
+    #menu-popup.active {
+      display: block;
+    }
+    #menu-popup h3 {
+      margin: 0 0 10px 0;
+      font-size: 1.2rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+    /* COVER + DETAILS */
+    #cover-card {
+      background: rgba(0,0,0,0.4);
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 6px 40px #0005;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      max-width: 800px;
+      width: 100%;
+    }
+    #album-cover {
+      width: 320px;
+      height: 320px;
+      background: #333;
+      border-radius: 16px;
+      box-shadow: 0 2px 14px #0008;
+      object-fit: cover;
+      object-position: center;
+      margin-right: 40px;
+      border: 3px solid #fff;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    #album-cover img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 12px;
+    }
+    #details {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      color: #fff;
+      flex: 1;
+    }
+    #song-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin: 0 0 10px 0;
+      letter-spacing: 0.5px;
+      line-height: 1.2;
+      /* allow wrapping */
+      white-space: pre-wrap;
+    }
+    #song-artist {
+      font-size: 1.5rem;
+      font-weight: 400;
+      margin: 0;
+      opacity: 0.9;
+    }
+    @media (max-width: 900px) {
+      #main-content { flex-direction: column; height: auto; }
+      #cover-card { flex-direction: column; align-items: center; }
+      #album-cover { margin-right: 0; margin-bottom: 20px; width: 240px; height: 240px; }
+      #song-title { font-size: 2rem; text-align: center; }
+      #song-artist { font-size: 1.2rem; text-align: center; }
+    }
+    /* BOTTOM CONTROLS */
+    #controls {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.6);
+      border-radius: 40px;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      z-index: 2;
+    }
+    #play-btn {
+      width: 50px;
+      height: 50px;
+      background: #fff;
+      border: none;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 2px 10px #0005;
+      transition: background 0.2s;
+      padding: 0;
+    }
+    #play-btn:hover {
+      background: #eee;
+    }
+    #play-btn svg {
+      width: 24px;
+      height: 24px;
+      fill: #311B0B;
+    }
+    #volume-slider {
+      -webkit-appearance: none;
+      width: 200px;
+      height: 4px;
+      background: #fff;
+      border-radius: 2px;
+      outline: none;
+      cursor: pointer;
+    }
+    #volume-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #311B0B;
+      cursor: pointer;
+      box-shadow: 0 1px 5px #0005;
+    }
+    #volume-slider::-moz-range-thumb {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #311B0B;
+      cursor: pointer;
+      box-shadow: 0 1px 5px #0005;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-8px);}  
+      to { opacity: 1; transform: translateY(0);}  
+    }
+  </style>
+</head>
+<body>
+  <!-- Blurred Album Cover Background -->
+  <img id="bg-blur" src="" alt="Background Cover" />
+
+  <!-- HEADER: Logo & Menu -->
+  <div id="header">
+    <div id="logo">
+      <!-- SVG Radio icon -->
+      <img src="data:image/svg+xml;utf8,<svg viewBox='0 0 56 56' fill='none' xmlns='http://www.w3.org/2000/svg'><rect x='6' y='18' width='44' height='28' rx='6' stroke='white' stroke-width='3' fill='white'/><circle cx='18' cy='38' r='6' stroke='white' stroke-width='3' fill='none'/><rect x='32' y='35' width='12' height='4' rx='2' fill='white'/><rect x='9' y='9' width='36' height='4' rx='2' fill='white' transform='rotate(-20 9 9)'/></svg>" alt="Radio Logo"/>
+      Radio
+    </div>
+    <button id="menu-btn" aria-label="Open menu">&#9776;</button>
+    <div id="menu-popup">
+      <h3>About</h3>
+      <p>This is an internet radio player demo.<br>Made by Erik.</p>
+    </div>
+  </div>
+
+  <!-- Main content, horizontally centered -->
+  <div id="main-content">
+    <div id="cover-card">
+      <div id="album-cover">album cover</div>
+      <div id="details">
+        <div id="song-title"><b>Song Title</b></div>
+        <div id="song-artist">Artist Name</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM CONTROLS -->
+  <div id="controls">
+    <button id="play-btn" aria-label="Play/Pause">
+      <svg id="play-icon" viewBox="0 0 64 64"><polygon points="16,8 56,32 16,56"/></svg>
+      <svg id="pause-icon" viewBox="0 0 64 64" style="display:none"><rect x="16" y="12" width="12" height="40"/><rect x="36" y="12" width="12" height="40"/></svg>
+    </button>
+    <input id="volume-slider" type="range" min="0" max="1" step="0.01" value="1" />
+    <audio id="audio" src="http://erik-server.ddns.net:8000/stream"></audio>
+  </div>
+
+  <script>
+    // --- VARIABLES ---
+    const coverUrl = "http://erik-server.ddns.net:5000/image";
+    const metaUrl = "http://erik-server.ddns.net:5000/metadata";
+    const albumCoverEl = document.getElementById('album-cover');
+    const bgBlurEl = document.getElementById('bg-blur');
+    const songTitleEl = document.getElementById('song-title');
+    const songArtistEl = document.getElementById('song-artist');
+    const audio = document.getElementById('audio');
+    const playBtn = document.getElementById('play-btn');
+    const playIcon = document.getElementById('play-icon');
+    const pauseIcon = document.getElementById('pause-icon');
+    const volumeSlider = document.getElementById('volume-slider');
+    const menuBtn = document.getElementById('menu-btn');
+    const menuPopup = document.getElementById('menu-popup');
+
+    // --- LOAD ALBUM COVER (with error fallback) ---
+    function setAlbumCover(src) {
+      const img = new window.Image();
+      img.crossOrigin = "anonymous";
+      img.onload = () => {
+        albumCoverEl.innerHTML = "";
+        const cloned = img.cloneNode();
+        cloned.style.width = "100%";
+        cloned.style.height = "100%";
+        cloned.style.objectFit = "cover";
+        cloned.style.borderRadius = "12px";
+        albumCoverEl.appendChild(cloned);
+        // Blur background
+        bgBlurEl.src = src + '?cache=' + Date.now();
+      };
+      img.onerror = () => {
+        albumCoverEl.style.background = "#333";
+        albumCoverEl.innerHTML = "No cover";
+        bgBlurEl.src = "";
+      };
+      img.src = src + '?cache=' + Date.now();
+    }
+    setAlbumCover(coverUrl);
+
+    // --- LOAD SONG META ---
+    function fetchMetadata() {
+      fetch(metaUrl + '?cache=' + Date.now())
+        .then(r => r.text())
+        .then(txt => {
+          let song = "Song", artist = "Artist";
+          try {
+            let j = JSON.parse(txt);
+            if (j.artist && j.title) {
+              artist = j.artist;
+              song = j.title;
+            } else if (j.title && !j.artist) {
+              const parts = j.title.trim().split(/\s+/);
+              artist = parts.shift();
+              song = parts.join(' ') || "Song";
+            } else if (j.song) {
+              const parts = j.song.split('#');
+              if (parts.length === 2) {
+                artist = parts[0];
+                song = parts[1];
+              } else {
+                const sub = j.song.trim().split(/\s+/);
+                artist = sub.shift();
+                song = sub.join(' ') || j.song;
+              }
+            }
+          } catch {
+            if (txt.includes("#")) {
+              const parts = txt.split("#");
+              artist = parts[0].trim();
+              song = parts[1].trim();
+            } else {
+              const parts = txt.trim().split(/\s+/);
+              artist = parts.shift();
+              song = parts.join(' ') || txt.trim();
+            }
+          }
+          // Insert line breaks before parentheses for better wrapping
+          let displaySong = song.replace(/\s*\(/g, "<br>(");
+          songTitleEl.innerHTML = "<b>" + displaySong + "</b>";
+          songArtistEl.textContent = artist || "Artist";
+        });
+    }
+    fetchMetadata();
+    setInterval(fetchMetadata, 4000);
+
+    // --- RELOAD COVER (in case it changes) ---
+    setInterval(() => setAlbumCover(coverUrl), 6000);
+
+    // --- PLAY/PAUSE AUDIO ---
+    playBtn.onclick = () => {
+      if (audio.paused) {
+        audio.play();
+        playIcon.style.display = "none";
+        pauseIcon.style.display = "block";
+      } else {
+        audio.pause();
+        playIcon.style.display = "block";
+        pauseIcon.style.display = "none";
+      }
+    };
+    audio.onpause = () => {
+      playIcon.style.display = "block";
+      pauseIcon.style.display = "none";
+    };
+    audio.onplay = () => {
+      playIcon.style.display = "none";
+      pauseIcon.style.display = "block";
+    };
+    // --- VOLUME CONTROL ---
+    volumeSlider.oninput = (e) => {
+      audio.volume = e.target.value;
+    };
+
+    // --- MENU TOGGLE ---
+    menuBtn.onclick = (e) => {
+      menuPopup.classList.toggle('active');
+      e.stopPropagation();
+    };
+    window.onclick = () => menuPopup.classList.remove('active');
+    menuPopup.onclick = (e) => e.stopPropagation();
+  </script>
+</body>
+</html>
