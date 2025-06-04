@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Internet Radio</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     html, body {
       height: 100%;
@@ -11,14 +11,9 @@
       padding: 0;
       font-family: 'Segoe UI', Arial, sans-serif;
       box-sizing: border-box;
-      overflow: hidden;
-    }
-    body {
-      height: 100vh;
-      min-height: 100vh;
-      position: relative;
-      color: #fff;
       background-color: #311B0B;
+      color: #fff;
+      overflow: hidden;
     }
     /* BLURRED BACKGROUND */
     #bg-blur {
@@ -33,49 +28,42 @@
       transition: background 0.5s;
       pointer-events: none;
     }
-    /* CONTENT */
+    /* CONTENT WRAPPER */
     #main-content {
       position: relative;
       z-index: 1;
-      height: calc(100vh - 100px);
       display: flex;
-      flex-direction: row;
       justify-content: center;
       align-items: center;
-      gap: 40px;
+      width: 100%;
+      height: calc(100vh - 100px);
+      box-sizing: border-box;
       padding: 20px;
+      text-align: center;
     }
     /* HEADER */
     #header {
       position: absolute;
-      width: 100vw;
-      top: 0; left: 0;
+      width: 100%;
+      top: 0;
+      left: 0;
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
-      padding: 24px 32px 0 32px;
+      align-items: center;
+      padding: 16px 16px 0 16px;
       z-index: 2;
       pointer-events: none;
     }
     #logo {
-      font-size: 2rem;
+      font-size: 1.5rem;
       font-weight: 600;
       letter-spacing: 2px;
-      display: flex;
-      align-items: center;
       pointer-events: auto;
       user-select: none;
       color: #fff;
     }
-    #logo img {
-      height: 2.2rem;
-      margin-right: 10px;
-      vertical-align: middle;
-      filter: drop-shadow(0 2px 8px #0002);
-    }
     #menu-btn {
-      font-size: 2rem;
-      font-weight: 400;
+      font-size: 1.5rem;
       background: none;
       border: none;
       color: #fff;
@@ -84,60 +72,59 @@
       pointer-events: auto;
       user-select: none;
     }
-    /* MENU DROPDOWN */
+    /* MENU POPUP */
     #menu-popup {
       display: none;
       position: absolute;
-      top: 60px;
-      right: 40px;
-      min-width: 210px;
-      background: rgba(255,255,255,0.96);
-      border-radius: 18px;
-      box-shadow: 0 10px 32px #0002;
+      top: 48px;
+      right: 16px;
+      min-width: 180px;
+      background: rgba(255, 255, 255, 0.96);
+      border-radius: 12px;
+      box-shadow: 0 8px 24px #0002;
       z-index: 9999;
-      padding: 18px 28px;
+      padding: 12px 16px;
       animation: fadeIn 0.2s;
-      font-size: 1.1rem;
+      font-size: 1rem;
       color: #222;
     }
     #menu-popup.active {
       display: block;
     }
     #menu-popup h3 {
-      margin: 0 0 10px 0;
-      font-size: 1.2rem;
+      margin: 0 0 8px 0;
+      font-size: 1.1rem;
       font-weight: 600;
-      letter-spacing: 1px;
     }
-    /* COVER + DETAILS */
+    /* COVER CARD */
     #cover-card {
-      background: rgba(0,0,0,0.4);
-      border-radius: 20px;
-      padding: 20px;
-      box-shadow: 0 6px 40px #0005;
-      display: flex;
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 4px 32px #0005;
+      display: inline-flex;
       flex-direction: row;
       align-items: center;
-      max-width: 800px;
-      width: 100%;
+      gap: 20px;
+      box-sizing: border-box;
+      max-width: 90vw;
     }
     #album-cover {
-      width: 320px;
-      height: 320px;
+      width: clamp(160px, 30vw, 280px);
+      height: clamp(160px, 30vw, 280px);
       background: #333;
-      border-radius: 16px;
+      border-radius: 12px;
       box-shadow: 0 2px 14px #0008;
       object-fit: cover;
       object-position: center;
-      margin-right: 40px;
-      border: 3px solid #fff;
-      overflow: hidden;
       flex-shrink: 0;
       display: flex;
       align-items: center;
       justify-content: center;
       color: #ccc;
-      font-size: 1.2rem;
+      font-size: 1rem;
+      border: 3px solid #fff;
+      overflow: hidden;
     }
     #album-cover img {
       width: 100%;
@@ -150,52 +137,41 @@
       flex-direction: column;
       justify-content: center;
       color: #fff;
-      flex: 1;
+      text-align: left;
+      white-space: normal;
     }
     #song-title {
-      font-size: 2.5rem;
+      font-size: clamp(1.5rem, 4vw, 2rem);
       font-weight: 700;
-      margin: 0 0 10px 0;
+      margin: 0 0 8px 0;
       letter-spacing: 0.5px;
       line-height: 1.2;
-      /* allow wrapping */
-      white-space: pre-wrap;
     }
     #song-artist {
-      font-size: 1.5rem;
+      font-size: clamp(1rem, 3vw, 1.2rem);
       font-weight: 400;
       margin: 0;
       opacity: 0.9;
     }
-    @media (max-width: 900px) {
-      #main-content { flex-direction: column; height: auto; }
-      #cover-card { flex-direction: column; align-items: center; }
-      #album-cover { 
-        margin-right: 0; 
-        margin-bottom: 20px; 
-        width: 240px; 
-        height: 240px; 
-      }
-      #song-title { font-size: 2rem; text-align: center; }
-      #song-artist { font-size: 1.2rem; text-align: center; }
-    }
     /* BOTTOM CONTROLS */
     #controls {
       position: absolute;
-      bottom: 20px;
+      bottom: 16px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(0,0,0,0.6);
-      border-radius: 40px;
-      padding: 10px 20px;
+      background: rgba(0, 0, 0, 0.6);
+      border-radius: 32px;
+      padding: 8px 16px;
       display: flex;
       align-items: center;
-      gap: 20px;
+      gap: 16px;
       z-index: 2;
+      flex-wrap: wrap;
+      box-sizing: border-box;
     }
     #play-btn {
-      width: 50px;
-      height: 50px;
+      width: clamp(40px, 8vw, 50px);
+      height: clamp(40px, 8vw, 50px);
       background: #fff;
       border: none;
       border-radius: 50%;
@@ -211,13 +187,13 @@
       background: #eee;
     }
     #play-btn svg {
-      width: 24px;
-      height: 24px;
+      width: clamp(18px, 4vw, 24px);
+      height: clamp(18px, 4vw, 24px);
       fill: #311B0B;
     }
     #volume-slider {
       -webkit-appearance: none;
-      width: 200px;
+      width: clamp(120px, 25vw, 180px);
       height: 4px;
       background: #fff;
       border-radius: 2px;
@@ -227,46 +203,53 @@
     #volume-slider::-webkit-slider-thumb {
       -webkit-appearance: none;
       appearance: none;
-      width: 14px;
-      height: 14px;
+      width: 12px;
+      height: 12px;
       border-radius: 50%;
       background: #311B0B;
       cursor: pointer;
       box-shadow: 0 1px 5px #0005;
     }
     #volume-slider::-moz-range-thumb {
-      width: 14px;
-      height: 14px;
+      width: 12px;
+      height: 12px;
       border-radius: 50%;
       background: #311B0B;
       cursor: pointer;
       box-shadow: 0 1px 5px #0005;
     }
+    @media only screen and (max-width: 600px) and (orientation: portrait) {
+      #cover-card { flex-direction: column; align-items: center; }
+      #song-title, #song-artist { text-align: center; }
+      #controls { gap: 8px; padding: 6px 12px; }
+      #play-btn { width: 36px; height: 36px; }
+      #play-btn svg { width: 16px; height: 16px; }
+      #volume-slider { width: 100px; }
+      #main-content { height: 100vh; justify-content: center; align-items: center; padding-top: 0; }
+    }
+    @media only screen and (max-width: 600px) and (orientation: landscape) {
+      #cover-card { transform: scale(0.4); }
+      #album-cover { width: 60px; height: 60px; }
+      #details { transform: scale(0.7); }
+      #controls { transform: scale(0.4) translateY(20px); }
+      #main-content { height: 100vh; justify-content: center; align-items: center; padding-top: 0; }
+    }
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-8px);}  
-      to { opacity: 1; transform: translateY(0);}  
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
 <body>
-  <!-- Blurred Album Cover Background -->
-  <img id="bg-blur" src="" alt="Background Cover" />
-
-  <!-- HEADER: Logo & Menu -->
+  <img id="bg-blur" src="" alt="Background Cover">
   <div id="header">
-    <div id="logo">
-      <!-- SVG Radio icon -->
-      <img src="data:image/svg+xml;utf8,<svg viewBox='0 0 56 56' fill='none' xmlns='https://www.w3.org/2000/svg'><rect x='6' y='18' width='44' height='28' rx='6' stroke='white' stroke-width='3' fill='white'/><circle cx='18' cy='38' r='6' stroke='white' stroke-width='3' fill='none'/><rect x='32' y='35' width='12' height='4' rx='2' fill='white'/><rect x='9' y='9' width='36' height='4' rx='2' fill='white' transform='rotate(-20 9 9)'/></svg>" alt="Radio Logo"/>
-      Radio
-    </div>
+    <div id="logo">Levél+</div>
     <button id="menu-btn" aria-label="Open menu">&#9776;</button>
     <div id="menu-popup">
       <h3>About</h3>
-      <p>This is an internet radio player demo.<br />Made by Erik.</p>
+      <p>This is an internet radio player demo.<br/>Made by Erik.</p>
     </div>
   </div>
-
-  <!-- Main content, horizontally centered -->
   <div id="main-content">
     <div id="cover-card">
       <div id="album-cover">No cover</div>
@@ -276,29 +259,16 @@
       </div>
     </div>
   </div>
-
-  <!-- BOTTOM CONTROLS -->
   <div id="controls">
     <button id="play-btn" aria-label="Play/Pause">
-      <svg id="play-icon" viewBox="0 0 64 64">
-        <polygon points="16,8 56,32 16,56" />
-      </svg>
-      <svg id="pause-icon" viewBox="0 0 64 64" style="display:none">
-        <rect x="16" y="12" width="12" height="40" />
-        <rect x="36" y="12" width="12" height="40" />
-      </svg>
+      <svg id="play-icon" viewBox="0 0 64 64"><polygon points="16,8 56,32 16,56"></polygon></svg>
+      <svg id="pause-icon" viewBox="0 0 64 64" style="display:none"><rect x="16" y="12" width="12" height="40"></rect><rect x="36" y="12" width="12" height="40"></rect></svg>
     </button>
-    <input id="volume-slider" type="range" min="0" max="1" step="0.01" value="1" />
-    <audio id="audio" src="https://erik-server.ddns.net/stream"></audio>
+    <input id="volume-slider" type="range" min="0" max="1" step="0.01" value="1">
+    <audio id="audio"></audio>
   </div>
-
-  <!-- 
-    Move all script logic into a DOMContentLoaded handler so that
-    getElementById(...) never returns null. 
-  -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // --- ELEMENT REFERENCES (all exist, or we log a warning) ---
       const albumCoverEl = document.getElementById('album-cover');
       const bgBlurEl     = document.getElementById('bg-blur');
       const songTitleEl  = document.getElementById('song-title');
@@ -311,43 +281,21 @@
       const menuBtn      = document.getElementById('menu-btn');
       const menuPopup    = document.getElementById('menu-popup');
 
-      function assertExists(el, name) {
-        if (!el) console.warn(`⚠️ Warning: element "${name}" not found in DOM.`);
-      }
-      assertExists(albumCoverEl, 'album-cover');
-      assertExists(bgBlurEl, 'bg-blur');
-      assertExists(songTitleEl, 'song-title');
-      assertExists(songArtistEl, 'song-artist');
-      assertExists(audio, 'audio');
-      assertExists(playBtn, 'play-btn');
-      assertExists(playIcon, 'play-icon');
-      assertExists(pauseIcon, 'pause-icon');
-      assertExists(volumeSlider, 'volume-slider');
-      assertExists(menuBtn, 'menu-btn');
-      assertExists(menuPopup, 'menu-popup');
-
-      // --- CONFIGURATION ---
       const coverUrl = "https://erik-server.ddns.net/image";
       const metaUrl  = "https://erik-server.ddns.net/metadata";
+      audio.src = "https://erik-server.ddns.net/stream";
 
-      // --- LOAD ALBUM COVER (with error fallback) ---
       function setAlbumCover(src) {
         if (!albumCoverEl || !bgBlurEl) return;
-
-        const img = new window.Image();
+        const img = new Image();
         img.crossOrigin = "anonymous";
         img.onload = () => {
-          // clear any previous content
           albumCoverEl.innerHTML = "";
-          // clone the loaded image into our div
-          const cloned = img.cloneNode();
-          cloned.style.width = "100%";
-          cloned.style.height = "100%";
-          cloned.style.objectFit = "cover";
-          cloned.style.borderRadius = "12px";
-          albumCoverEl.appendChild(cloned);
-
-          // blur the same image behind
+          img.style.width = "100%";
+          img.style.height = "100%";
+          img.style.objectFit = "cover";
+          img.style.borderRadius = "12px";
+          albumCoverEl.appendChild(img.cloneNode());
           bgBlurEl.src = src + '?cache=' + Date.now();
         };
         img.onerror = () => {
@@ -355,117 +303,74 @@
           albumCoverEl.textContent = "No cover";
           bgBlurEl.src = "";
         };
-        // Append a cache-buster so GitHub pages (or any cache) doesn’t serve a stale image
         img.src = src + '?cache=' + Date.now();
       }
 
-      // Immediately set the first cover
-      setAlbumCover(coverUrl);
-
-      // --- LOAD SONG META ---
-      function fetchMetadata() {
-        if (!songTitleEl || !songArtistEl) return;
-
-        fetch(metaUrl + '?cache=' + Date.now())
-          .then(r => r.text())
-          .then(txt => {
-            let song   = "Song";
-            let artist = "Artist";
-
-            // Try parsing JSON
-            try {
-              let j = JSON.parse(txt);
-              if (j.artist && j.title) {
-                artist = j.artist;
-                song   = j.title;
-              } else if (j.title && !j.artist) {
-                // If there's only a title, split off the first word as artist
-                const parts = j.title.trim().split(/\s+/);
-                artist = parts.shift();
-                song   = parts.join(' ') || "Song";
-              } else if (j.song) {
-                // Some streams send a "song" field like "Artist#Title"
-                const parts = j.song.split('#');
-                if (parts.length === 2) {
-                  artist = parts[0];
-                  song   = parts[1];
-                } else {
-                  const sub = j.song.trim().split(/\s+/);
-                  artist = sub.shift();
-                  song   = sub.join(' ') || j.song;
-                }
-              }
-            } catch {
-              // Fallback: plain-text format "Artist#Title" or "Artist Title"
-              if (txt.includes("#")) {
-                const parts = txt.split("#");
-                artist = parts[0].trim();
-                song   = parts[1].trim();
-              } else {
-                const parts = txt.trim().split(/\s+/);
-                artist = parts.shift();
-                song   = parts.join(' ') || txt.trim();
+      async function fetchMetadata() {
+        try {
+          const response = await fetch(metaUrl + '?cache=' + Date.now());
+          const txt = await response.text();
+          let song = "Song";
+          let artist = "Artist";
+          try {
+            const j = JSON.parse(txt);
+            if (j.artist && j.title) {
+              artist = j.artist;
+              song = j.title;
+            } else if (j.song) {
+              const parts = j.song.split('#');
+              if (parts.length === 2) {
+                artist = parts[0];
+                song = parts[1];
               }
             }
-
-            // Insert line breaks before parentheses for nicer wrapping
-            let displaySong = song.replace(/\s*\(/g, "<br>(");
-            songTitleEl.innerHTML  = "<b>" + displaySong + "</b>";
-            songArtistEl.textContent = artist || "Artist";
-          })
-          .catch(err => {
-            console.error("Error fetching metadata:", err);
-          });
+          } catch {
+            if (txt.includes("#")) {
+              const parts = txt.split("#");
+              artist = parts[0].trim();
+              song = parts[1].trim();
+            } else {
+              const parts = txt.trim().split(/\s+/);
+              artist = parts.shift();
+              song = parts.join(' ') || txt.trim();
+            }
+          }
+          const displaySong = song.replace(/\s*\(/g, "<br>(");
+          songTitleEl.innerHTML = `<b>${displaySong}</b>`;
+          songArtistEl.textContent = artist;
+        } catch (e) {
+          console.error('Metadata fetch error:', e);
+        }
       }
 
-      // Fire once now, then every 4 seconds
+      function togglePlay() {
+        if (audio.paused) audio.play(); else audio.pause();
+      }
+
+      playBtn.addEventListener('click', togglePlay);
+      audio.addEventListener('play', () => {
+        playIcon.style.display = 'none';
+        pauseIcon.style.display = 'block';
+      });
+      audio.addEventListener('pause', () => {
+        playIcon.style.display = 'block';
+        pauseIcon.style.display = 'none';
+      });
+      volumeSlider.addEventListener('input', e => {
+        audio.volume = e.target.value;
+      });
+
+      setAlbumCover(coverUrl);
       fetchMetadata();
       setInterval(fetchMetadata, 4000);
-
-      // --- RELOAD COVER (in case it changes) ---
       setInterval(() => setAlbumCover(coverUrl), 6000);
 
-      // --- PLAY / PAUSE AUDIO ---
-      if (playBtn && playIcon && pauseIcon && audio) {
-        playBtn.addEventListener('click', () => {
-          if (audio.paused) {
-            audio.play();
-          } else {
-            audio.pause();
-          }
-        });
-        audio.addEventListener('play', () => {
-          playIcon.style.display  = "none";
-          pauseIcon.style.display = "block";
-        });
-        audio.addEventListener('pause', () => {
-          playIcon.style.display  = "block";
-          pauseIcon.style.display = "none";
-        });
-      }
-
-      // --- VOLUME CONTROL ---
-      if (volumeSlider && audio) {
-        volumeSlider.addEventListener('input', e => {
-          audio.volume = e.target.value;
-        });
-      }
-
-      // --- MENU TOGGLE ---
-      if (menuBtn && menuPopup) {
-        menuBtn.addEventListener('click', e => {
-          menuPopup.classList.toggle('active');
-          e.stopPropagation();
-        });
-        // When clicking anywhere else, hide the menu
-        window.addEventListener('click', () => {
-          menuPopup.classList.remove('active');
-        });
-        // But if you click inside the popup, don’t close it
-        menuPopup.addEventListener('click', e => {
-          e.stopPropagation();
-        });
-      }
+      menuBtn.addEventListener('click', e => {
+        menuPopup.classList.toggle('active');
+        e.stopPropagation();
+      });
+      window.addEventListener('click', () => menuPopup.classList.remove('active'));
+      menuPopup.addEventListener('click', e => e.stopPropagation());
     });
   </script>
 </body>
